@@ -4,29 +4,27 @@ import React, { useState } from "react";
 const Home: React.FC = () => {
   const [prompt, setPrompt] = useState<string>("");
   const [imageUrl, setImageUrl] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleGenerateImage = async () => {
     setIsLoading(true);
+
     const resp = await fetch('/api/generate-image', {
       method: 'POST',
-      body: JSON.stringify({
-        prompt
-      }),
+      body: JSON.stringify({ prompt }),
       headers: {
-        'Content-type': 'application/json'
-      }
-    })
-
+        'Content-type': 'application/json',
+      },
+    });
 
     if (!resp.ok) {
-      setIsLoading(false)
+      setIsLoading(false);
       return;
     }
 
-    const data = await resp.json()
-    setIsLoading(false)
+    const data = await resp.json();
+    setImageUrl(data.message); // <- Set generated image URL
+    setIsLoading(false);
   };
 
   return (
@@ -49,13 +47,17 @@ const Home: React.FC = () => {
             onClick={handleGenerateImage}
             className="w-full p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200"
           >
-            {
-              isLoading ? "Loading..." : "Generate Image"
-            }
+            {isLoading ? "Loading..." : "Generate Image"}
           </button>
         </div>
 
-        {imageUrl && <ImageCard action={() => setImageUrl(imageUrl)} imageUrl={imageUrl} prompt={prompt} />}
+        {imageUrl && (
+          <ImageCard
+            action={() => setImageUrl(imageUrl)}
+            imageUrl={imageUrl}
+            prompt={prompt}
+          />
+        )}
       </div>
     </div>
   );
